@@ -1,1 +1,5 @@
+
+file(GLOB_RECURSE headers ${CMAKE_CURRENT_LIST_DIR}/*.h)
+set(GOTCHA_HEADERS ${headers} PARENT_SCOPE)
+
 install(DIRECTORY gotcha DESTINATION include FILES_MATCHING PATTERN *.h)

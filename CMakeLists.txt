@@ -19,13 +19,16 @@ if(GOTCHA_ENABLE_TESTS)
     add_definitions("-DGOTCHA_ENABLE_COVERAGE_TESTING")
   endif()
 endif()
+
 cmake_minimum_required(VERSION 2.8)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 add_subdirectory(include)
 add_subdirectory(src)
+
 if(GOTCHA_ENABLE_TESTS)
-add_subdirectory(test)
-setup_coverage_target()
+    add_subdirectory(test)
+    setup_coverage_target()
 endif()
 
 include(CMakePackageConfigHelpers)

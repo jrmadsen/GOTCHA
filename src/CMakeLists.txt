@@ -12,25 +12,26 @@ set(GOTCHA_SOURCES
   translations.c
 )
 
-add_library(gotcha SHARED ${GOTCHA_SOURCES})
+set(CMAKE_C_EXTENSIONS ON)
 
+file(GLOB INTERNAL_HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.h)
+add_library(Gotcha SHARED ${GOTCHA_SOURCES} ${GOTCHA_HEADERS} ${INTERNAL_HEADERS})
+set_target_properties(Gotcha PROPERTIES OUTPUT_NAME gotcha)
 
-set_target_properties(gotcha PROPERTIES SOVERSION ${LIBTOOL_INTERFACE})
-set_target_properties(gotcha PROPERTIES VERSION "${LIBTOOL_INTERFACE}.${LIBTOOL_REVISION}.${LIBTOOL_AGE}")
-set_target_properties(gotcha PROPERTIES COMPILE_FLAGS "-fvisibility=${DEFAULT_SYMBOL_VISIBILITY}")
-set_target_properties(gotcha PROPERTIES LINK_FLAGS "-fvisibility=${DEFAULT_SYMBOL_VISIBILITY}")
-if(GOTCHA_ENABLE_TESTS)
-add_library(gotcha_no_libc SHARED ${GOTCHA_SOURCES})
-set_target_properties(gotcha_no_libc PROPERTIES SOVERSION ${LIBTOOL_INTERFACE})
-set_target_properties(gotcha_no_libc PROPERTIES VERSION "${LIBTOOL_INTERFACE}.${LIBTOOL_REVISION}.${LIBTOOL_AGE}")
-set_target_properties(gotcha_no_libc PROPERTIES COMPILE_DEFINITIONS "FORCE_NO_LIBC")
-set_target_properties(gotcha_no_libc PROPERTIES COMPILE_FLAGS "-fvisibility=${DEFAULT_SYMBOL_VISIBILITY}")
-set_target_properties(gotcha_no_libc PROPERTIES LINK_FLAGS "-fvisibility=${DEFAULT_SYMBOL_VISIBILITY}")
-endif()
+set_target_properties(Gotcha PROPERTIES SOVERSION ${LIBTOOL_INTERFACE})
+set_target_properties(Gotcha PROPERTIES VERSION "${LIBTOOL_INTERFACE}.${LIBTOOL_REVISION}.${LIBTOOL_AGE}")
+set_target_properties(Gotcha PROPERTIES COMPILE_FLAGS "-fvisibility=${DEFAULT_SYMBOL_VISIBILITY}")
+set_target_properties(Gotcha PROPERTIES LINK_FLAGS "-fvisibility=${DEFAULT_SYMBOL_VISIBILITY}")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Gotcha PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
 
-install(TARGETS gotcha EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}) 
-install(EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gotcha)
+install(TARGETS Gotcha EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}) 
+install(EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_PREFIX}/share/cmake/gotcha)
 
-add_subdirectory(example)
+if(BUILD_EXAMPLES)
+    add_subdirectory(example)
+endif()
