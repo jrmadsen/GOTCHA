@@ -45,9 +45,9 @@ set(gotcha_INSTALL_INCLUDE_DIR include/)
 configure_package_config_file(
   "cmake/config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gotcha"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/gotcha"
   PATH_VARS gotcha_INSTALL_INCLUDE_DIR)
 
 install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config-version.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gotcha")
+  DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/gotcha")
