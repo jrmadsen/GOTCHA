@@ -1,6 +1,10 @@
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+
+project(gotcha VERSION 1.0.4 LANGUAGES C CXX)
+
 option(GOTCHA_ENABLE_TESTS "Enable internal tests" Off)
 option(GOTCHA_ENABLE_COVERAGE_TESTS "Enable coverage tests" Off)
-project(gotcha)
+
 include(CheckCXXCompilerFlag)
 include(cmake/gotcha.cmake)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -10,6 +14,12 @@ set(LIBTOOL_REVISION 0)
 set(LIBTOOL_AGE 2)
 
 set(DEFAULT_SYMBOL_VISIBILITY hidden)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(GOTCHA_ENABLE_TESTS)
   enable_testing()
@@ -19,7 +29,6 @@ if(GOTCHA_ENABLE_TESTS)
     add_definitions("-DGOTCHA_ENABLE_COVERAGE_TESTING")
   endif()
 endif()
-cmake_minimum_required(VERSION 2.8)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_subdirectory(include)
 add_subdirectory(src)
