@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
 project(gotcha VERSION 1.0.4 LANGUAGES C CXX)
 
 option(GOTCHA_ENABLE_TESTS "Enable internal tests" Off)
+option(GOTCHA_ENABLE_EXAMPLES "Enable building examples" Off)
 option(GOTCHA_ENABLE_COVERAGE_TESTS "Enable coverage tests" Off)
 
 include(CheckCXXCompilerFlag)
