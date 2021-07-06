@@ -5,6 +5,11 @@ project(gotcha VERSION 1.0.4 LANGUAGES C CXX)
 option(GOTCHA_ENABLE_TESTS "Enable internal tests" Off)
 option(GOTCHA_ENABLE_EXAMPLES "Enable building examples" Off)
 option(GOTCHA_ENABLE_COVERAGE_TESTS "Enable coverage tests" Off)
+option(GOTCHA_INSTALL_CONFIG "Enable installation of gotcha CMake config" On)
+option(GOTCHA_INSTALL_HEADERS "Enable installation of gotcha headers" On)
+
+# always build PIC
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include(CheckCXXCompilerFlag)
 include(cmake/gotcha.cmake)
@@ -49,12 +54,14 @@ write_basic_package_version_file(
 set(gotcha_INSTALL_INCLUDE_DIR include/)
 
 # Configure gotcha-config.cmake
-configure_package_config_file(
-  "cmake/config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gotcha"
-  PATH_VARS gotcha_INSTALL_INCLUDE_DIR)
+if(GOTCHA_INSTALL_CONFIG)
+  configure_package_config_file(
+    "cmake/config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/gotcha"
+    PATH_VARS gotcha_INSTALL_INCLUDE_DIR)
 
-install(
-  FILES "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config-version.cmake"
-  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gotcha")
+  install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config-version.cmake"
+    DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/cmake/gotcha")
+endif()
