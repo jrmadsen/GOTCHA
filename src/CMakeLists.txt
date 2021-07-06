@@ -34,7 +34,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS gotcha EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 if(GOTCHA_INSTALL_CONFIG)
-    install(EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gotcha)
+    install(EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/cmake/gotcha)
 endif()
 
 if(GOTCHA_ENABLE_EXAMPLES)
