@@ -5,11 +5,14 @@
 #include "elf_ops.h"
 #include <dlfcn.h>
 
-#if defined(__GLIBC__) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 34
-#    define GOTCHA_DL_SYM_WORKAROUND 1
+// unless specified, always use workaround because it will not fail
+#if GOTCHA_DLOPEN_DLSYM == 0
+#    if defined(__GLIBC__) && __GLIBC__ >= 2 && __GLIBC_MINOR__ >= 34
+#        warning "GOTCHA_DLOPEN_DLSYM should be > 0 for glib >= 2.34"
+#    endif
 #endif
 
-#if defined(GOTCHA_DL_SYM_WORKAROUND)
+#if GOTCHA_DLOPEN_DLSYM > 0
 static void* (*gotcha_dlsym_internal)(void*, const char*);
 #else
 void*
@@ -66,7 +69,7 @@ static void* dlsym_wrapper(void* handle, const char* symbol_name){
 
   if(handle == RTLD_NEXT)
   {
-#if defined(GOTCHA_DL_SYM_WORKAROUND)
+#if GOTCHA_DLOPEN_DLSYM > 0
       return (*gotcha_dlsym_internal)(RTLD_NEXT, symbol_name);
 #else
       return _dl_sym(RTLD_NEXT, symbol_name, __builtin_return_address(0));
@@ -74,7 +77,7 @@ static void* dlsym_wrapper(void* handle, const char* symbol_name){
   }
   else if(handle == RTLD_DEFAULT)
   {
-#if defined(GOTCHA_DL_SYM_WORKAROUND)
+#if GOTCHA_DLOPEN_DLSYM > 0
       return (*gotcha_dlsym_internal)(RTLD_DEFAULT, symbol_name);
 #else
       return _dl_sym(RTLD_DEFAULT, symbol_name, __builtin_return_address(0));
@@ -96,7 +99,7 @@ struct gotcha_binding_t dl_binds[] = {
 void
 handle_libdl()
 {
-#if defined(GOTCHA_DL_SYM_WORKAROUND)
+#if GOTCHA_DLOPEN_DLSYM > 0
     void* libdl_handle = dlopen("libdl.so", RTLD_LAZY | RTLD_LOCAL);
     if(libdl_handle == NULL)
     {
