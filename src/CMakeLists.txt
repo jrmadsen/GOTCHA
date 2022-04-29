@@ -15,6 +15,15 @@ set(GOTCHA_SOURCES
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 set(CMAKE_C_VISIBILITY_PRESET "${DEFAULT_SYMBOL_VISIBILITY}")
 
+if(CMAKE_DL_LIBS)
+    set(GOTCHA_dl_LIBRARY ${CMAKE_DL_LIBS})
+else()
+    find_library(GOTCHA_dl_LIBRARY NAMES dl)
+    if(NOT GOTCHA_dl_LIBRARY)
+        set(GOTCHA_dl_LIBRARY dl)
+    endif()
+endif()
+
 add_library(gotcha SHARED ${GOTCHA_SOURCES})
 
 set_target_properties(gotcha PROPERTIES SOVERSION ${LIBTOOL_INTERFACE})
@@ -23,6 +32,7 @@ target_compile_definitions(gotcha PRIVATE GOTCHA_DLOPEN_DLSYM=$<BOOL:${GOTCHA_DL
 target_include_directories(gotcha PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+target_link_libraries(gotcha PRIVATE ${GOTCHA_dl_LIBRARY})
 if(GOTCHA_ENABLE_TESTS)
     add_library(gotcha_no_libc SHARED ${GOTCHA_SOURCES})
     set_target_properties(gotcha_no_libc PROPERTIES SOVERSION ${LIBTOOL_INTERFACE})
