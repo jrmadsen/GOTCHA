@@ -4,7 +4,7 @@
 #include "hash.h"
 #include "tool.h"
 
-void handle_libdl();
+void handle_libdl(int _v);
 extern void update_all_library_gots(hash_table_t *bindings);
 extern long lookup_exported_symbol(const char *name, const struct link_map *lib,
                                    void **symbol);
