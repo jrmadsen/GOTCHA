@@ -97,7 +97,7 @@ struct gotcha_binding_t dl_binds[] = {
 };
 
 void
-handle_libdl()
+handle_libdl(int _do_dl_binds)
 {
 #if GOTCHA_DLOPEN_DLSYM > 0
     void* libdl_handle = dlopen("libdl.so", RTLD_LAZY | RTLD_LOCAL);
@@ -114,5 +114,8 @@ handle_libdl()
                          "RTLD_DEFAULT or RTLD_NEXT as the handle will fail.\n");
     }
 #endif
-    gotcha_wrap(dl_binds, 2, "gotcha");
+    if(_do_dl_binds > 0)
+    {
+        gotcha_wrap(dl_binds, 2, "gotcha");
+    }
 }

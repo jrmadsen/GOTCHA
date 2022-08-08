@@ -24,7 +24,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #ifndef GOTCHA_TYPES_H
 #define GOTCHA_TYPES_H
 
-#if defined(__cplusplus) 
+#define GOTCHA_INIT_EXT 1
+
+#if defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -50,7 +52,7 @@ typedef enum gotcha_error_t {
   GOTCHA_INVALID_TOOL          //!< Invalid tool name
 }gotcha_error_t;
 
-#if defined(__cplusplus) 
+#if defined(__cplusplus)
 }
 #endif
 

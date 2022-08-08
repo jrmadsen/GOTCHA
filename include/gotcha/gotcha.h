@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  *          The intended use pattern is as follows
  *
- *					TODO ON-INTERFACE-SOLID: document the interface 
+ *					TODO ON-INTERFACE-SOLID: document the interface
  *                                   usage
  *
  ******************************************************************************
@@ -33,7 +33,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include "gotcha/gotcha_types.h"
 #include <link.h>
 
-#if defined(__cplusplus) 
+#if defined(__cplusplus)
 extern "C" {
 #endif
 
@@ -56,8 +56,8 @@ extern "C" {
 /*!
  ******************************************************************************
  *
- * \fn enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t* bindings, 
- *                                     void** wrappers, void*** originals, 
+ * \fn enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t* bindings,
+ *                                     void** wrappers, void*** originals,
  *                                     int num_actions);
  *
  * \brief Makes GOTCHA wrap the functions picked in gotcha_prepare_symbols
@@ -124,8 +124,25 @@ GOTCHA_EXPORT void gotcha_only_filter_last();
 GOTCHA_EXPORT void gotcha_set_library_filter_func(int(*new_func)(struct link_map*));
 GOTCHA_EXPORT void gotcha_restore_library_filter_func();
 
+/*!
+ ******************************************************************************
+ *
+ * \fn int gotcha_init_ext(int do_dl_bind)
+ *
+ * \brief Explicitly initialize gotcha, specifying whether to wrap dlopen
+ *        and dlsym. Check availability of this function via GOTCHA_INIT_EXT
+ *        defined and equal to 1
+ *
+ * \param do_dl_bind Value > 0 enables wrapping dlopen and dlsym
+ *
+ * \return Returns 0 if wrapping dlopen and dlsym succeeded. Returns 1
+ *         if gotcha was already initialized.
+ *
+ ******************************************************************************
+ */
+GOTCHA_EXPORT int gotcha_init_ext(int);
 
-#if defined(__cplusplus) 
+#if defined(__cplusplus)
 }
 #endif
 

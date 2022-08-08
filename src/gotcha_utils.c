@@ -32,7 +32,7 @@ static void debug_init()
       return;
    }
    debug_initialized = 1;
-   
+
    debug_str = gotcha_getenv(GOTCHA_DEBUG_ENV);
    if (!debug_str) {
       return;
@@ -67,7 +67,7 @@ static int link_map_cmp(struct link_map *a, struct link_map *b)
 static void setup_hash_tables() {
    create_hashtable(&library_table, 128, (hash_func_t) link_map_hash, (hash_cmp_t) link_map_cmp);
    create_hashtable(&function_hash_table, 4096, (hash_func_t) strhash, (hash_cmp_t) gotcha_strcmp);
-   create_hashtable(&notfound_binding_table, 128, (hash_func_t) strhash, (hash_cmp_t) gotcha_strcmp);    
+   create_hashtable(&notfound_binding_table, 128, (hash_func_t) strhash, (hash_cmp_t) gotcha_strcmp);
 }
 
 struct library_t *get_library(struct link_map *map)
@@ -111,14 +111,19 @@ void remove_library(struct link_map *map)
    gotcha_free(lib);
 }
 
-void gotcha_init(){
+int gotcha_init_ext(int _do_dl_binds)
+{
    static int gotcha_initialized = 0;
    if(gotcha_initialized){
-     return;
+     return gotcha_initialized;
    }
    gotcha_initialized = 1;
    debug_init();
    setup_hash_tables();
-   handle_libdl();
+   handle_libdl(_do_dl_binds);
+   return 0;
 }
 
+void gotcha_init(){
+    gotcha_init_ext(0);
+}
