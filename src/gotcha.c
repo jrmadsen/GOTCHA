@@ -60,7 +60,7 @@ int prepare_symbol(struct internal_binding_t *binding)
          debug_printf(3, "Creating new library object for %s\n", LIB_NAME(lib));
          int_library = add_library(lib);
       }
-      
+
       if (is_vdso(lib)) {
          debug_printf(2, "Skipping VDSO library at 0x%lx with name %s\n",
                       lib->l_addr, LIB_NAME(lib));
@@ -77,8 +77,8 @@ int prepare_symbol(struct internal_binding_t *binding)
       if (gnu_hash) {
          debug_printf(3, "Checking GNU hash for %s in %s\n",
                       user_binding->name, LIB_NAME(lib));
-         result = lookup_gnu_hash_symbol(user_binding->name, symtab, strtab,
-                                         (struct gnu_hash_header *) gnu_hash);
+         result = lookup_gnu_hash_symbol(user_binding->name, symtab, versym, strtab,
+                                         (struct gnu_hash_header*) gnu_hash);
       }
       if (elf_hash && result == -1) {
          debug_printf(3, "Checking ELF hash for %s in %s\n",
@@ -92,12 +92,12 @@ int prepare_symbol(struct internal_binding_t *binding)
          continue;
       }
       if (! GOTCHA_CHECK_VISIBILITY(symtab[result])) {
-         debug_printf(3, "Symbol %s found but not exported in %s\n", 
+         debug_printf(3, "Symbol %s found but not exported in %s\n",
                       user_binding->name, LIB_NAME(lib));
          continue;
       }
 
-      debug_printf(2, "Symbol %s found in %s at 0x%lx\n", 
+      debug_printf(2, "Symbol %s found in %s at 0x%lx\n",
                    user_binding->name, LIB_NAME(lib),
                    symtab[result].st_value + lib->l_addr);
       setInternalBindingAddressPointer(user_binding->function_handle,(void *)(symtab[result].st_value + lib->l_addr));
@@ -130,7 +130,7 @@ static int rewrite_wrapper_orders(struct internal_binding_t* binding)
 {
   const char* name = binding->user_binding->name;
   int insert_priority = get_priority(binding->associated_binding_table->tool);
-  
+
   if(gotcha_strcmp(name,"main")==0){
     if(!main_wrapped){
       debug_printf(2, "Wrapping main with Gotcha's internal wrappers");
@@ -244,7 +244,7 @@ static int update_library_got(struct link_map *map, hash_table_t *bindingtable)
       debug_printf(2, "Library %s is already up-to-date.  Skipping GOT rewriting\n", LIB_NAME(map));
       return 0;
    }
-   
+
    if (!(lib->flags & LIB_GOT_MARKED_WRITEABLE)) {
       mark_got_writable(map);
       lib->flags |= LIB_GOT_MARKED_WRITEABLE;
@@ -262,7 +262,7 @@ void update_all_library_gots(hash_table_t *bindings)
    debug_printf(2, "Searching all callsites for %lu bindings\n", (unsigned long) bindings->entry_count);
    for (lib_iter = _r_debug.r_map; lib_iter != 0; lib_iter = lib_iter->l_next) {
       update_library_got(lib_iter, bindings);
-   }   
+   }
 }
 
 GOTCHA_EXPORT enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t* user_bindings, int num_actions, const char* tool_name)
@@ -330,7 +330,7 @@ GOTCHA_EXPORT enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t* user_bind
         new_bindings_count++;
      }
   }
-  
+
   if (new_bindings_count) {
      update_all_library_gots(&new_bindings);
      destroy_hashtable(&new_bindings);

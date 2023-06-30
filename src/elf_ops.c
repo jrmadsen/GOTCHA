@@ -31,36 +31,56 @@ static uint32_t gnu_hash_func(const char *str) {
   return hash;
 }
 
-signed long lookup_gnu_hash_symbol(const char *name, ElfW(Sym) * syms,
-                                   char *symnames,
-                                   void *sheader) {
-  uint32_t *buckets, *vals;
-  uint32_t hash_val;
-  uint32_t cur_sym, cur_sym_hashval;
-  struct gnu_hash_header *header = (struct gnu_hash_header *) (sheader);
+/* Symbol versioning
+ *
+ * https://refspecs.linuxfoundation.org/LSB_3.0.0/LSB-PDA/LSB-PDA.junk/symversion.html
+ *
+ * versym[symidx] does only provides an index into the ElfW(Verdef) array
+ * (DT_VERDEF/SHT_GNU_verdef) and is not the version itself, but SHT_GNU_verdef
+ * is sorted in ascending order and the entries have a parent relation, thus a
+ * higher index should always be a higher version. As we only search for the
+ * latest symbol/highest version it is sufficient to compare the index.
+ */
 
-  buckets = (uint32_t *)(((unsigned char *)(header + 1)) +
-                         (header->maskwords * sizeof(ElfW(Addr))));
-  vals = buckets + header->nbuckets;
+signed long
+lookup_gnu_hash_symbol(const char* name, ElfW(Sym) * syms, const ElfW(Half) * versym,
+                       char* symnames, void* sheader)
+{
+    signed long latest_sym         = -1;
+    ElfW(Half) latest_sym_ver      = 0;
+    struct gnu_hash_header* header = (struct gnu_hash_header*) (sheader);
 
-  hash_val = gnu_hash_func(name);
-  cur_sym = buckets[hash_val % header->nbuckets];
-  if (cur_sym == 0) {
-    return -1;
-  }
+    uint32_t* buckets = (uint32_t*) (((unsigned char*) (header + 1)) +
+                                     (header->maskwords * sizeof(ElfW(Addr))));
+    uint32_t* vals    = buckets + header->nbuckets;
 
-  hash_val &= ~1;
-  for (;;) {
-    cur_sym_hashval = vals[cur_sym - header->symndx];
-    if (((cur_sym_hashval & ~1) == hash_val) &&
-        (gotcha_strcmp(name, symnames + syms[cur_sym].st_name) == 0)) {
-      return (signed long)cur_sym;
+    uint32_t hash_val = gnu_hash_func(name);
+    uint32_t cur_sym  = buckets[hash_val % header->nbuckets];
+    if(cur_sym == 0)
+    {
+        return -1;
     }
-    if (cur_sym_hashval & 1) {
-      return -1;
+
+    hash_val &= ~1;
+    for(;;)
+    {
+        uint32_t cur_sym_hashval = vals[cur_sym - header->symndx];
+        if(((cur_sym_hashval & ~1) == hash_val) &&
+           (gotcha_strcmp(name, symnames + syms[cur_sym].st_name) == 0) &&
+           (!versym || (versym[cur_sym] & 0x7fff) > latest_sym_ver))
+        {
+            latest_sym = (signed long) cur_sym;
+            if(versym)
+                latest_sym_ver = versym[cur_sym] & 0x7fff;
+        }
+        else if(cur_sym_hashval & 1)
+        {
+            break;
+        }
+        cur_sym++;
     }
-    cur_sym++;
-  }
+
+    return latest_sym;
 }
 
 static unsigned long elf_hash(const unsigned char *name) {
