@@ -10,7 +10,7 @@ without even the IMPLIED WARRANTY OF MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE. See the terms and conditions of the GNU Lesser General Public License
 for more details.  You should have received a copy of the GNU Lesser General
 Public License along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 /*!
@@ -22,15 +22,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  *          The intended use pattern is as follows
  *
- *					TODO ON-INTERFACE-SOLID: document the interface
- *                                   usage
+ *					TODO ON-INTERFACE-SOLID: document the
+ *interface usage
  *
  ******************************************************************************
  */
 #ifndef GOTCHA_H
 #define GOTCHA_H
 
-#include "gotcha/gotcha_types.h"
+#include <gotcha/gotcha_config.h>
+#include <gotcha/gotcha_types.h>
 #include <link.h>
 
 #if defined(__cplusplus)
@@ -45,11 +46,12 @@ extern "C" {
  * \param name     The name of the function you want to get a pointer to
  * \param ret_type The return type of the function you want a pointer to
  * \param ...      A comma separated list of the types of the parameters
- * 								 to the function you're getting a pointer to
+ * 		   to the function you're getting a pointer to
  ******************************************************************************
  */
 
-#define GOTCHA_MAKE_FUNCTION_PTR(name, ret_type, ...) ret_type(*name)(__VA_ARGS__)
+#define GOTCHA_MAKE_FUNCTION_PTR(name, ret_type, ...) \
+  ret_type (*name)(__VA_ARGS__)
 
 #define GOTCHA_EXPORT __attribute__((__visibility__("default")))
 
@@ -70,8 +72,9 @@ extern "C" {
  ******************************************************************************
  */
 
-GOTCHA_EXPORT enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t* bindings, int num_actions, const char* tool_name);
-
+GOTCHA_EXPORT enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t *bindings,
+                                              int num_actions,
+                                              const char *tool_name);
 
 /*!
  ******************************************************************************
@@ -88,7 +91,8 @@ GOTCHA_EXPORT enum gotcha_error_t gotcha_wrap(struct gotcha_binding_t* bindings,
  *
  ******************************************************************************
  */
-GOTCHA_EXPORT enum gotcha_error_t gotcha_set_priority(const char* tool_name, int priority);
+GOTCHA_EXPORT enum gotcha_error_t gotcha_set_priority(const char *tool_name,
+                                                      int priority);
 
 /*!
  ******************************************************************************
@@ -104,43 +108,28 @@ GOTCHA_EXPORT enum gotcha_error_t gotcha_set_priority(const char* tool_name, int
  *
  ******************************************************************************
  */
-GOTCHA_EXPORT enum gotcha_error_t gotcha_get_priority(const char* tool_name, int *priority);
+GOTCHA_EXPORT enum gotcha_error_t gotcha_get_priority(const char *tool_name,
+                                                      int *priority);
 
 /*!
  ******************************************************************************
  *
  * \fn enum void* gotcha_get_wrappee(gotcha_wrappee_handle_t)
  *
- * \brief Given a GOTCHA wrapper's handle, returns the wrapped function for it to call
+ * \brief Given a GOTCHA wrapper's handle, returns the wrapped function for it
+ *to call
  *
  * \param handle The wrappee handle to return the function pointer for
  *
  ******************************************************************************
  */
-GOTCHA_EXPORT void* gotcha_get_wrappee(gotcha_wrappee_handle_t handle);
+GOTCHA_EXPORT void *gotcha_get_wrappee(gotcha_wrappee_handle_t handle);
 
-GOTCHA_EXPORT void gotcha_filter_libraries_by_name(const char* nameFilter);
+GOTCHA_EXPORT void gotcha_filter_libraries_by_name(const char *nameFilter);
 GOTCHA_EXPORT void gotcha_only_filter_last();
-GOTCHA_EXPORT void gotcha_set_library_filter_func(int(*new_func)(struct link_map*));
+GOTCHA_EXPORT void gotcha_set_library_filter_func(
+    int (*new_func)(struct link_map *));
 GOTCHA_EXPORT void gotcha_restore_library_filter_func();
-
-/*!
- ******************************************************************************
- *
- * \fn int gotcha_init_ext(int do_dl_bind)
- *
- * \brief Explicitly initialize gotcha, specifying whether to wrap dlopen
- *        and dlsym. Check availability of this function via GOTCHA_INIT_EXT
- *        defined and equal to 1
- *
- * \param do_dl_bind Value > 0 enables wrapping dlopen and dlsym
- *
- * \return Returns 0 if wrapping dlopen and dlsym succeeded. Returns 1
- *         if gotcha was already initialized.
- *
- ******************************************************************************
- */
-GOTCHA_EXPORT int gotcha_init_ext(int);
 
 #if defined(__cplusplus)
 }

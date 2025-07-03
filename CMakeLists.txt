@@ -25,7 +25,7 @@ if(GOTCHA_ENABLE_TESTS)
   endif()
 endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_BINARY_DIR}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 add_subdirectory(include)
 add_subdirectory(src)
 if(GOTCHA_ENABLE_TESTS)
@@ -55,8 +55,13 @@ install(
   FILES "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config.cmake" "${CMAKE_CURRENT_BINARY_DIR}/gotcha-config-version.cmake"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/gotcha")
 
+# Suppress CMP0177 warning (CMake 3.28+)
+if(POLICY CMP0177)
+  cmake_policy(SET CMP0177 NEW)
+endif()
+
 # Write the configure file
-configure_file("${CMAKE_SOURCE_DIR}/cmake/gotcha_config.h.in"
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/gotcha_config.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/include/gotcha/gotcha_config.h" @ONLY)
 install(
                 FILES "${CMAKE_CURRENT_BINARY_DIR}/include/gotcha/gotcha_config.h"
