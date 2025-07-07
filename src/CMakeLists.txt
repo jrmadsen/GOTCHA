@@ -12,8 +12,19 @@ set(GOTCHA_SOURCES
         translations.c
 )
 
-add_library(gotcha SHARED ${GOTCHA_SOURCES})
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+set(CMAKE_C_VISIBILITY_PRESET "${DEFAULT_SYMBOL_VISIBILITY}")
 
+if(CMAKE_DL_LIBS)
+    set(GOTCHA_dl_LIBRARY ${CMAKE_DL_LIBS})
+else()
+    find_library(GOTCHA_dl_LIBRARY NAMES dl)
+    if(NOT GOTCHA_dl_LIBRARY)
+        set(GOTCHA_dl_LIBRARY dl)
+    endif()
+endif()
+
+add_library(gotcha SHARED ${GOTCHA_SOURCES})
 
 set_target_properties(gotcha PROPERTIES SOVERSION ${LIBTOOL_INTERFACE})
 set_target_properties(gotcha PROPERTIES VERSION "${LIBTOOL_INTERFACE}.${LIBTOOL_REVISION}.${LIBTOOL_AGE}")
@@ -41,4 +52,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 install(TARGETS gotcha EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR})
 install(EXPORT gotcha-targets DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gotcha)
 
-add_subdirectory(example)
+if(GOTCHA_ENABLE_EXAMPLES)
+  add_subdirectory(example)
+endif()

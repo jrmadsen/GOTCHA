@@ -55,37 +55,39 @@ signed long lookup_gnu_hash_symbol(const char *name, ElfW(Sym) * syms,
   ElfW(Half) latest_sym_ver = 0;
   struct gnu_hash_header *header = (struct gnu_hash_header *)(sheader);
 
-  buckets = (uint32_t *)(((unsigned char *)(header + 1)) +
-                         (header->maskwords * sizeof(ElfW(Addr))));
-  vals = buckets + header->nbuckets;
+signed long
+lookup_gnu_hash_symbol(const char* name, ElfW(Sym) * syms, const ElfW(Half) * versym,
+                       char* symnames, void* sheader)
+{
+    signed long latest_sym         = -1;
+    ElfW(Half) latest_sym_ver      = 0;
+    struct gnu_hash_header* header = (struct gnu_hash_header*) (sheader);
 
-  hash_val = gnu_hash_func(name);
-  cur_sym = buckets[hash_val % header->nbuckets];
-  if (cur_sym == 0) {
-    return -1;
-  }
+    uint32_t* buckets = (uint32_t*) (((unsigned char*) (header + 1)) +
+                                     (header->maskwords * sizeof(ElfW(Addr))));
+    uint32_t* vals    = buckets + header->nbuckets;
 
-  hash_val &= ~1;
-  for (;;) {
-    cur_sym_hashval = vals[cur_sym - header->symndx];
-    if (((cur_sym_hashval & ~1) == hash_val) &&
-        (gotcha_strcmp(name, symnames + syms[cur_sym].st_name) == 0)) {
-      if (!versym) {
-        return (signed long)cur_sym;
+    hash_val &= ~1;
+    for (;;) {
+      cur_sym_hashval = vals[cur_sym - header->symndx];
+      if (((cur_sym_hashval & ~1) == hash_val) &&
+          (gotcha_strcmp(name, symnames + syms[cur_sym].st_name) == 0)) {
+        if (!versym) {
+          return (signed long)cur_sym;
+        }
+
+        if ((versym[cur_sym] & 0x7fff) > latest_sym_ver) {
+          latest_sym = (signed long)cur_sym;
+          latest_sym_ver = versym[cur_sym] & 0x7fff;
+        }
       }
-
-      if ((versym[cur_sym] & 0x7fff) > latest_sym_ver) {
-        latest_sym = (signed long)cur_sym;
-        latest_sym_ver = versym[cur_sym] & 0x7fff;
+      if (cur_sym_hashval & 1) {
+        break;
       }
+      cur_sym++;
     }
-    if (cur_sym_hashval & 1) {
-      break;
-    }
-    cur_sym++;
-  }
 
-  return latest_sym;
+    return latest_sym;
 }
 
 static unsigned long elf_hash(const unsigned char *name) {

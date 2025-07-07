@@ -12,8 +12,13 @@ set(LIBTOOL_AGE 2)
 
 set(GOTCHA_VERSION "(1, 0, 8)")
 
-
 set(DEFAULT_SYMBOL_VISIBILITY hidden)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(GOTCHA_ENABLE_TESTS)
   enable_testing()
@@ -29,8 +34,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 add_subdirectory(include)
 add_subdirectory(src)
 if(GOTCHA_ENABLE_TESTS)
-add_subdirectory(test)
-setup_coverage_target()
+  add_subdirectory(test)
+  setup_coverage_target()
 endif()
 
 include(CMakePackageConfigHelpers)
